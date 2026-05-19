@@ -1,11 +1,11 @@
 package com.monstergym.api.model.alunos;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.monstergym.api.model.agendamento.Agendamento;
+import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Getter
