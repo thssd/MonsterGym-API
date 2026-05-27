@@ -1,9 +1,6 @@
 package com.monstergym.api.controller;
 
-import com.monstergym.api.model.alunos.Aluno;
-import com.monstergym.api.model.alunos.DadosAlunos;
-import com.monstergym.api.model.alunos.DadosAtualizarAluno;
-import com.monstergym.api.model.alunos.DadosListagemAluno;
+import com.monstergym.api.model.alunos.*;
 import com.monstergym.api.repository.AlunoRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -11,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("alunos")
@@ -22,26 +21,38 @@ public class AlunosController {
 
     @PostMapping
     @Transactional
-    public void cadastrar(@RequestBody DadosAlunos dadosAlunos){
-        repository.save(new Aluno(dadosAlunos));
+    public ResponseEntity cadastrar(@RequestBody DadosAlunos dadosAlunos, UriComponentsBuilder componentsBuilder){
+        var aluno = new Aluno(dadosAlunos);
+
+        repository.save(aluno);
+
+        var uri = componentsBuilder.path("/alunos/{id}").buildAndExpand(aluno.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(new DadosDetalhamentoAluno(aluno));
     }
 
     @GetMapping
-    public Page<DadosListagemAluno> listar(@PageableDefault(sort = {"cpf"}) Pageable pageable){
-        return repository.findAllByAtivoTrue(pageable).map(DadosListagemAluno::new);
+    public ResponseEntity<Page<DadosListagemAluno>> listar(@PageableDefault(sort = {"cpf"}) Pageable pageable){
+        var paginacao = repository.findAllByAtivoTrue(pageable).map(DadosListagemAluno::new);
+
+        return ResponseEntity.ok(paginacao);
     }
 
     @PutMapping
     @Transactional
-    public void atualizar(@RequestBody @Valid DadosAtualizarAluno dadosAtualizarAluno){
+    public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizarAluno dadosAtualizarAluno){
         var carregarAluno = repository.getReferenceById(dadosAtualizarAluno.id());
         carregarAluno.atualizarInformacoes(dadosAtualizarAluno);
+
+        return ResponseEntity.ok(new DadosDetalhamentoAluno(carregarAluno));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public void excluir(@PathVariable Long id){
+    public ResponseEntity excluir(@PathVariable Long id){
         var carregarAluno = repository.getReferenceById(id);
         carregarAluno.excluir();
+
+        return ResponseEntity.noContent().build();
     }
 }

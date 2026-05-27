@@ -1,5 +1,6 @@
 package com.monstergym.api.controller;
 
+import com.monstergym.api.model.alunos.DadosDetalhamentoTreinador;
 import com.monstergym.api.model.treinadores.DadosAtualizarTreinador;
 import com.monstergym.api.model.treinadores.DadosListagemTreinadores;
 import com.monstergym.api.model.treinadores.DadosTreinadores;
@@ -11,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("treinadores")
@@ -24,26 +25,38 @@ public class TreinadorController {
 
     @PostMapping
     @Transactional
-    public void cadastrar(@RequestBody DadosTreinadores dadosTreinadores){
-        repository.save(new Treinador(dadosTreinadores));
+    public ResponseEntity cadastrar(@RequestBody DadosTreinadores dadosTreinadores, UriComponentsBuilder uriComponentsBuilder){
+        var treinador = new Treinador(dadosTreinadores);
+
+        repository.save(treinador);
+
+        var uri = uriComponentsBuilder.path("/treinador/{id}").buildAndExpand(treinador.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(new DadosDetalhamentoTreinador(treinador));
     }
 
     @GetMapping
-    public Page<DadosListagemTreinadores> listar(@PageableDefault(sort = {"id"}) Pageable pageable){
-        return repository.findAllByAtivoTrue(pageable).map(DadosListagemTreinadores::new);
+    public ResponseEntity<Page<DadosListagemTreinadores>> listar(@PageableDefault(sort = {"id"}) Pageable pageable){
+        var paginacao = repository.findAllByAtivoTrue(pageable).map(DadosListagemTreinadores::new);
+
+        return ResponseEntity.ok(paginacao);
     }
 
     @PutMapping
     @Transactional
-    public void atualizar(@RequestBody @Valid DadosAtualizarTreinador dadosAtualizarTreinador){
+    public ResponseEntity atualizar(@RequestBody @Valid DadosAtualizarTreinador dadosAtualizarTreinador){
         var carregarTreinador = repository.getReferenceById(dadosAtualizarTreinador.id());
         carregarTreinador.atualizarInformacoes(dadosAtualizarTreinador);
+
+        return ResponseEntity.ok(new DadosDetalhamentoTreinador(carregarTreinador));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public void excluir(@PathVariable Long id){
+    public ResponseEntity excluir(@PathVariable Long id){
         var carregarTreinador = repository.getReferenceById(id);
         carregarTreinador.excluir();
+
+        return ResponseEntity.noContent().build();
     }
 }
