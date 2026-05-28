@@ -1,6 +1,6 @@
 package com.monstergym.api.controller;
 
-import com.monstergym.api.model.alunos.*;
+import com.monstergym.api.domain.alunos.*;
 import com.monstergym.api.repository.AlunoRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

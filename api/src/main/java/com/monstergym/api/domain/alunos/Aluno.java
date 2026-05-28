@@ -1,11 +1,8 @@
-package com.monstergym.api.model.alunos;
+package com.monstergym.api.domain.alunos;
 
-import com.monstergym.api.model.agendamento.Agendamento;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
-
-import java.util.List;
 
 @Entity
 @Getter

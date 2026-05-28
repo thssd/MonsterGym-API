@@ -1,4 +1,4 @@
-package com.monstergym.api.model.treinadores;
+package com.monstergym.api.domain.treinadores;
 
 import jakarta.validation.constraints.NotNull;
 

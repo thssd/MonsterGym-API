@@ -1,4 +1,4 @@
-package com.monstergym.api.model.alunos;
+package com.monstergym.api.domain.alunos;
 
 public record DadosDetalhamentoAluno(Long id,
                                      String nome,

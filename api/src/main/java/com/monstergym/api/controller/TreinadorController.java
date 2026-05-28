@@ -1,10 +1,10 @@
 package com.monstergym.api.controller;
 
-import com.monstergym.api.model.alunos.DadosDetalhamentoTreinador;
-import com.monstergym.api.model.treinadores.DadosAtualizarTreinador;
-import com.monstergym.api.model.treinadores.DadosListagemTreinadores;
-import com.monstergym.api.model.treinadores.DadosTreinadores;
-import com.monstergym.api.model.treinadores.Treinador;
+import com.monstergym.api.domain.alunos.DadosDetalhamentoTreinador;
+import com.monstergym.api.domain.treinadores.DadosAtualizarTreinador;
+import com.monstergym.api.domain.treinadores.DadosListagemTreinadores;
+import com.monstergym.api.domain.treinadores.DadosTreinadores;
+import com.monstergym.api.domain.treinadores.Treinador;
 import com.monstergym.api.repository.TreinadorRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

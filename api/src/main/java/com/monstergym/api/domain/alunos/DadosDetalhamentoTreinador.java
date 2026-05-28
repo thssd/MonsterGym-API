@@ -1,7 +1,7 @@
-package com.monstergym.api.model.alunos;
+package com.monstergym.api.domain.alunos;
 
-import com.monstergym.api.model.treinadores.Especialidade;
-import com.monstergym.api.model.treinadores.Treinador;
+import com.monstergym.api.domain.treinadores.Especialidade;
+import com.monstergym.api.domain.treinadores.Treinador;
 
 public record DadosDetalhamentoTreinador(Long id,
                                          String nome,
