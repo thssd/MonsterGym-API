@@ -1,6 +1,6 @@
 package com.monstergym.api.controller;
 
-import com.monstergym.api.domain.alunos.DadosDetalhamentoTreinador;
+import com.monstergym.api.domain.treinadores.DadosDetalhamentoTreinador;
 import com.monstergym.api.domain.treinadores.DadosAtualizarTreinador;
 import com.monstergym.api.domain.treinadores.DadosListagemTreinadores;
 import com.monstergym.api.domain.treinadores.DadosTreinadores;
