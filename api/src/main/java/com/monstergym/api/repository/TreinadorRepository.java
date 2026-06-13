@@ -14,5 +14,7 @@ public interface TreinadorRepository extends JpaRepository<Treinador, Long>{
 
     Page<Treinador> findAllByAtivoTrue(Pageable pageable);
 
+    @Query("select t from Treinador t where t.ativo = true and t.especialidade = :especialidade and t.id not in(" +
+            "select a.treinador.id from Aula a where a.data = :data)order by rand() limit 1")
     Treinador escolherTreinadorAleatorio(Especialidade especialidade, @Future LocalDateTime data);
 }

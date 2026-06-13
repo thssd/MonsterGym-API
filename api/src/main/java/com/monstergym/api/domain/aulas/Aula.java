@@ -6,10 +6,12 @@ import com.monstergym.api.domain.treinadores.Treinador;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Getter
 @EqualsAndHashCode(of = "id")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -29,4 +31,11 @@ public class Aula {
     private LocalDateTime data;
     @Enumerated(EnumType.STRING)
     private Especialidade especialidade;
+
+    public Aula(Aula aula) {
+        this.id = aula.id;
+        this.treinador = aula.treinador;
+        this.aluno = aula.aluno;
+        this.data = aula.data;
+    }
 }
