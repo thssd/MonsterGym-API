@@ -1,7 +1,7 @@
 package com.monstergym.api.service;
 
 import com.monstergym.api.domain.aulas.Aula;
-import com.monstergym.api.domain.aulas.AulaRepository;
+import com.monstergym.api.repository.AulaRepository;
 import com.monstergym.api.domain.aulas.DadosAula;
 import com.monstergym.api.domain.aulas.DadosDetalhamentoAula;
 import com.monstergym.api.domain.treinadores.Treinador;

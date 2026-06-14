@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 
 public record DadosAula(Long idTreinador,
                         @NotNull
-                            Long idAluno,
+                        Long idAluno,
                         @Future
-                            LocalDateTime data,
+                        LocalDateTime data,
                         Especialidade especialidade) {
 }
