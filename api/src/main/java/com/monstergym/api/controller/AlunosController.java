@@ -2,6 +2,7 @@ package com.monstergym.api.controller;
 
 import com.monstergym.api.domain.alunos.*;
 import com.monstergym.api.repository.AlunoRepository;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("alunos")
+@SecurityRequirement(name = "bearer-key")
 public class AlunosController {
 
     @Autowired

@@ -6,6 +6,7 @@ import com.monstergym.api.domain.treinadores.DadosListagemTreinadores;
 import com.monstergym.api.domain.treinadores.DadosTreinadores;
 import com.monstergym.api.domain.treinadores.Treinador;
 import com.monstergym.api.repository.TreinadorRepository;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("treinadores")
+@SecurityRequirement(name = "bearer-key")
 public class TreinadorController {
 
     @Autowired

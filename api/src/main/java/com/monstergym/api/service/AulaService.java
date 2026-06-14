@@ -1,18 +1,17 @@
 package com.monstergym.api.service;
 
 import com.monstergym.api.domain.aulas.Aula;
-import com.monstergym.api.domain.aulas.validacoes.IValidadorAula;
-import com.monstergym.api.infra.exceptions.ValidacaoException;
-import com.monstergym.api.repository.AulaRepository;
 import com.monstergym.api.domain.aulas.DadosAula;
 import com.monstergym.api.domain.aulas.DadosDetalhamentoAula;
+import com.monstergym.api.domain.aulas.validacoes.IValidadorAula;
 import com.monstergym.api.domain.treinadores.Treinador;
+import com.monstergym.api.infra.exceptions.ValidacaoException;
 import com.monstergym.api.repository.AlunoRepository;
+import com.monstergym.api.repository.AulaRepository;
 import com.monstergym.api.repository.TreinadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service

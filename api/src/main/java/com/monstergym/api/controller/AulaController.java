@@ -2,6 +2,7 @@ package com.monstergym.api.controller;
 
 import com.monstergym.api.domain.aulas.DadosAula;
 import com.monstergym.api.service.AulaService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("aulas")
+@SecurityRequirement(name = "bearer-key")
 public class AulaController {
 
     @Autowired
