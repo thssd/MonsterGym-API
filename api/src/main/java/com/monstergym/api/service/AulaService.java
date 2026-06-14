@@ -2,6 +2,7 @@ package com.monstergym.api.service;
 
 import com.monstergym.api.domain.aulas.Aula;
 import com.monstergym.api.domain.aulas.validacoes.IValidadorAula;
+import com.monstergym.api.infra.exceptions.ValidacaoException;
 import com.monstergym.api.repository.AulaRepository;
 import com.monstergym.api.domain.aulas.DadosAula;
 import com.monstergym.api.domain.aulas.DadosDetalhamentoAula;
@@ -31,18 +32,18 @@ public class AulaService {
 
     public DadosDetalhamentoAula agendar(DadosAula dados){
         if (!alunoRepository.existsById(dados.idAluno())){
-            throw new RuntimeException("Id do aluno informado não existe.");
+            throw new ValidacaoException("Id do aluno informado não existe.");
         }
         
         if (dados.idTreinador() != null && !treinadorRepository.existsById(dados.idTreinador())){
-            throw new RuntimeException("Id do treinador informado não existe.");
+            throw new ValidacaoException("Id do treinador informado não existe.");
         }
 
         validadores.forEach(v -> v.validar(dados));
 
         var aluno = alunoRepository.getReferenceById(dados.idAluno());
         var treinador = escolherTreinador(dados);
-        var aula = new Aula(null, treinador, aluno, LocalDateTime.now(), null);
+        var aula = new Aula(null, treinador, aluno, dados.data(), null);
 
         aulaRepository.save(aula);
 
@@ -55,7 +56,7 @@ public class AulaService {
         }
 
         if (dados.especialidade() == null){
-            throw new RuntimeException("A especialidade é obrigátoria quando nenhum médico é enviado.");
+            throw new ValidacaoException("A especialidade é obrigátoria quando nenhum médico é enviado.");
         }
 
         return treinadorRepository.escolherTreinadorAleatorio(dados.especialidade(), dados.data());

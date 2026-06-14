@@ -1,6 +1,7 @@
 package com.monstergym.api.domain.aulas.validacoes;
 
 import com.monstergym.api.domain.aulas.DadosAula;
+import com.monstergym.api.infra.exceptions.ValidacaoException;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -13,10 +14,10 @@ public class ValidadorHorarioAntecedencia implements IValidadorAula {
         var dataAula = dados.data();
         var dataAtual = LocalDateTime.now();
 
-        var diferencaEmHoras = Duration.between(dataAula, dataAtual).toHours();
+        var diferencaEmHoras = Duration.between(dataAtual, dataAula).toHours();
 
         if (diferencaEmHoras < 1){
-            throw new RuntimeException("As aulas devem ser marcadas com pelo menos 1 hora de antecedência.");
+            throw new ValidacaoException("As aulas devem ser marcadas com pelo menos 1 hora de antecedência.");
         }
     }
 }

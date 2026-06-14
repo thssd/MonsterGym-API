@@ -1,12 +1,13 @@
 package com.monstergym.api.domain.aulas.validacoes;
 
 import com.monstergym.api.domain.aulas.DadosAula;
+import com.monstergym.api.infra.exceptions.ValidacaoException;
 import com.monstergym.api.repository.AulaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ValidadorAlunoOutraConsulta implements IValidadorAula {
+public class ValidadorOutraAula implements IValidadorAula {
 
     @Autowired
     private AulaRepository repository;
@@ -19,7 +20,7 @@ public class ValidadorAlunoOutraConsulta implements IValidadorAula {
                 ultimoHorario);
 
         if (outraAulaMesmoDia){
-            throw new RuntimeException("O aluno já possui outra aula no dia.");
+            throw new ValidacaoException("O aluno já possui outra aula no dia.");
         }
     }
 }

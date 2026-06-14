@@ -1,6 +1,7 @@
 package com.monstergym.api.domain.aulas.validacoes;
 
 import com.monstergym.api.domain.aulas.DadosAula;
+import com.monstergym.api.infra.exceptions.ValidacaoException;
 import com.monstergym.api.repository.AlunoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -12,11 +13,10 @@ public class ValidadorAlunoAtivo implements IValidadorAula {
     private AlunoRepository repository;
 
     public void validar(DadosAula dados){
-        var aluno = repository.getReferenceById(dados.idAluno());
-        var ativo = aluno.getAtivo();
+        var alunoAtivo = repository.findAtivoById(dados.idAluno());
 
-        if (!ativo){
-            throw new RuntimeException("O aluno está inátivo.");
+        if (!alunoAtivo){
+            throw new ValidacaoException("O aluno está inátivo.");
         }
     }
 }
