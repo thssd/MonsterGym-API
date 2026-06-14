@@ -29,12 +29,11 @@ public class SecurityConfigurations {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/registrar").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/treinadores").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/treinadores").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/treinadores").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/alunos").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/alunos").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/alunos").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/treinadores", "/alunos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/treinadores", "/alunos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/treinadores", "/alunos").hasRole("ADMIN")
+
                         .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
