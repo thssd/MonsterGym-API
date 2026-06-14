@@ -1,6 +1,7 @@
 package com.monstergym.api.service;
 
 import com.monstergym.api.domain.aulas.Aula;
+import com.monstergym.api.domain.aulas.validacoes.IValidadorAula;
 import com.monstergym.api.repository.AulaRepository;
 import com.monstergym.api.domain.aulas.DadosAula;
 import com.monstergym.api.domain.aulas.DadosDetalhamentoAula;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class AulaService {
@@ -24,6 +26,9 @@ public class AulaService {
     @Autowired
     private AlunoRepository alunoRepository;
 
+    @Autowired
+    private List<IValidadorAula> validadores;
+
     public DadosDetalhamentoAula agendar(DadosAula dados){
         if (!alunoRepository.existsById(dados.idAluno())){
             throw new RuntimeException("Id do aluno informado não existe.");
@@ -32,7 +37,9 @@ public class AulaService {
         if (dados.idTreinador() != null && !treinadorRepository.existsById(dados.idTreinador())){
             throw new RuntimeException("Id do treinador informado não existe.");
         }
-        
+
+        validadores.forEach(v -> v.validar(dados));
+
         var aluno = alunoRepository.getReferenceById(dados.idAluno());
         var treinador = escolherTreinador(dados);
         var aula = new Aula(null, treinador, aluno, LocalDateTime.now(), null);
