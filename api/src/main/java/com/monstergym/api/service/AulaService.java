@@ -63,7 +63,7 @@ public class AulaService {
         return treinadorRepository.escolherTreinadorAleatorio(dados.especialidade(), dados.data());
     }
 
-    private void cancelar(DadosCancelamentoAula dados){
+    public void cancelar(DadosCancelamentoAula dados){
         if (!aulaRepository.existsById(dados.idConsulta())){
             throw new ValidacaoException("Id da consulta não informado ou não existe");
         }
