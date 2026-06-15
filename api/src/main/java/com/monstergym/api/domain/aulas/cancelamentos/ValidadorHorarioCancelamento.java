@@ -3,10 +3,12 @@ package com.monstergym.api.domain.aulas.cancelamentos;
 import com.monstergym.api.infra.exceptions.ValidacaoException;
 import com.monstergym.api.repository.AulaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+@Component
 public class ValidadorHorarioCancelamento implements IValidadorCancelamentoAula {
 
     @Autowired
