@@ -1,9 +1,11 @@
 package com.monstergym.api.domain.aulas;
 
 import com.monstergym.api.domain.alunos.Aluno;
+import com.monstergym.api.domain.aulas.cancelamentos.MotivoCancelamento;
 import com.monstergym.api.domain.treinadores.Especialidade;
 import com.monstergym.api.domain.treinadores.Treinador;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,6 +33,9 @@ public class Aula {
     private LocalDateTime data;
     @Enumerated(EnumType.STRING)
     private Especialidade especialidade;
+    @Enumerated(EnumType.STRING)
+    private MotivoCancelamento motivoCancelamento;
+    private String descricao;
 
     public Aula(Aula aula) {
         this.id = aula.id;
@@ -44,5 +49,10 @@ public class Aula {
         this.treinador = treinador;
          this.aluno = aluno;
          this.data = data;
+    }
+
+    public void cancelar (@NotNull MotivoCancelamento motivoCancelamento, String descricao){
+        this.motivoCancelamento = motivoCancelamento;
+        this.descricao = descricao;
     }
 }

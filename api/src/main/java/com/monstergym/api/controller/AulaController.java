@@ -1,6 +1,7 @@
 package com.monstergym.api.controller;
 
 import com.monstergym.api.domain.aulas.DadosAula;
+import com.monstergym.api.domain.aulas.cancelamentos.DadosCancelamentoAula;
 import com.monstergym.api.service.AulaService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -26,5 +27,9 @@ public class AulaController {
         var dto = service.agendar(dados);
 
         return ResponseEntity.ok(dto);
+    }
+
+    public ResponseEntity cancelar(@RequestBody @Valid DadosCancelamentoAula dadosCancelamento){
+
     }
 }
