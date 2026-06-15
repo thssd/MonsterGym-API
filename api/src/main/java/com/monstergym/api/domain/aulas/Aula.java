@@ -38,4 +38,11 @@ public class Aula {
         this.aluno = aula.aluno;
         this.data = aula.data;
     }
+
+    public Aula(Long id, Treinador treinador, Aluno aluno, LocalDateTime data) {
+        this.id = id;
+        this.treinador = treinador;
+         this.aluno = aluno;
+         this.data = data;
+    }
 }

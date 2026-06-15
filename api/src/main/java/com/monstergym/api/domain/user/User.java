@@ -31,6 +31,11 @@ public class User implements UserDetails {
         this.role = role;
     }
 
+    public User(DadosAutenticar dados) {
+        this.username = dados.username();
+        this.password = dados.password();
+    }
+
     @Override
     public String getUsername() {
         return username;
