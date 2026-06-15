@@ -4,6 +4,7 @@ import com.monstergym.api.domain.aulas.Aula;
 import com.monstergym.api.domain.aulas.DadosAula;
 import com.monstergym.api.domain.aulas.DadosDetalhamentoAula;
 import com.monstergym.api.domain.aulas.cancelamentos.DadosCancelamentoAula;
+import com.monstergym.api.domain.aulas.cancelamentos.IValidadorCancelamentoAula;
 import com.monstergym.api.domain.aulas.cancelamentos.MotivoCancelamento;
 import com.monstergym.api.domain.aulas.validacoes.IValidadorAula;
 import com.monstergym.api.domain.treinadores.Treinador;
@@ -30,6 +31,9 @@ public class AulaService {
 
     @Autowired
     private List<IValidadorAula> validadores;
+
+    @Autowired
+    private List<IValidadorCancelamentoAula> canceladores;
 
     public DadosDetalhamentoAula agendar(DadosAula dados){
         if (!alunoRepository.existsById(dados.idAluno())){
@@ -75,6 +79,7 @@ public class AulaService {
         if (dados.motivoCancelamento() == MotivoCancelamento.OUTRO && dados.descricao() == null){
             throw new ValidacaoException("Informe o motivo do cancelamento.");
         }
+        canceladores.forEach(c -> c.cancelar(dados));
 
         var aula = aulaRepository.getReferenceById(dados.idConsulta());
         aula.cancelar(dados.motivoCancelamento(), dados.descricao());
