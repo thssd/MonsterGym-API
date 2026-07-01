@@ -20,6 +20,8 @@ public class Aluno {
     private String telefone;
     private String cpf;
     private Boolean ativo;
+    @Enumerated(EnumType.STRING)
+    private Planos plano;
 
     public Aluno(DadosAlunos dadosAlunos) {
         this.ativo = true;
@@ -27,6 +29,7 @@ public class Aluno {
         this.email = dadosAlunos.email();
         this.telefone = dadosAlunos.telefone();
         this.cpf = dadosAlunos.cpf();
+        this.plano = dadosAlunos.plano();
     }
 
     public void atualizarInformacoes(@Valid DadosAtualizarAluno dadosAtualizarAluno) {
@@ -38,6 +41,9 @@ public class Aluno {
         }
         if (dadosAtualizarAluno.telefone() != null) {
             this.telefone = dadosAtualizarAluno.telefone();
+        }
+        if (dadosAtualizarAluno.plano() != null) {
+            this.plano = dadosAtualizarAluno.plano();
         }
     }
 

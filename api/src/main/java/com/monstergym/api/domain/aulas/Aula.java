@@ -47,8 +47,8 @@ public class Aula {
     public Aula(Long id, Treinador treinador, Aluno aluno, LocalDateTime data) {
         this.id = id;
         this.treinador = treinador;
-         this.aluno = aluno;
-         this.data = data;
+        this.aluno = aluno;
+        this.data = data;
     }
 
     public void cancelar (@NotNull MotivoCancelamento motivoCancelamento, String descricao){
