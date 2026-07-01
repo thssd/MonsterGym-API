@@ -30,9 +30,10 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/registrar").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/treinadores", "/alunos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/treinadores", "/alunos", "/pagamentos").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/treinadores", "/alunos").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/treinadores", "/alunos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/treinadores", "/alunos", "/pagamentos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/pagamentos").hasRole("ADMIN")
 
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated())
