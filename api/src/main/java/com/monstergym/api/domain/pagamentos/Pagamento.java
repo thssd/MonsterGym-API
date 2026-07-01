@@ -23,7 +23,7 @@ public class Pagamento {
     private LocalDateTime dataHora;
     @Enumerated(EnumType.STRING)
     private Planos plano;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_aluno")
     private Aluno aluno;
 
