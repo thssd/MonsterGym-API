@@ -1,10 +1,10 @@
 package com.monstergym.api.service;
 
-import com.monstergym.api.domain.alunos.Planos;
 import com.monstergym.api.domain.pagamentos.DadosCancelamentoPagamento;
 import com.monstergym.api.domain.pagamentos.DadosDetalhamentoPagamento;
 import com.monstergym.api.domain.pagamentos.DadosPagamento;
 import com.monstergym.api.domain.pagamentos.Pagamento;
+import com.monstergym.api.domain.pagamentos.validacoes.IValidadorPagamento;
 import com.monstergym.api.infra.exceptions.ValidacaoException;
 import com.monstergym.api.repository.AlunoRepository;
 import com.monstergym.api.repository.PagamentoRepository;
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.util.List;
 
 @Service
 public class PagametoService {
@@ -24,6 +24,9 @@ public class PagametoService {
     @Autowired
     private PagamentoRepository pagamentoRepository;
 
+    @Autowired
+    private List<IValidadorPagamento> validadores;
+
     public DadosDetalhamentoPagamento aprovarPagamento(DadosPagamento dados) {
         if (!alunoRepository.existsById(dados.idAluno())){
             throw new ValidacaoException("Id do aluno informado não existe.");
@@ -33,7 +36,7 @@ public class PagametoService {
         var aluno = alunoRepository.getReferenceById(dados.idAluno());
         var pagamento = new Pagamento(null, dados.valor(), dataHora, dados.plano(), aluno);
 
-        verificarPagamento(dados);
+        validadores.forEach(v -> v.validar(dados));
 
         pagamentoRepository.save(pagamento);
 
@@ -47,13 +50,5 @@ public class PagametoService {
         }
 
         pagamentoRepository.deleteById(dados.idPagamento());
-    }
-
-    //este metodo verifica se o plano do aluno condiz com o valor inserido no json
-    private void verificarPagamento(DadosPagamento dados){
-        if (!Objects.equals(dados.valor(), dados.plano().getValor())) {
-            throw new ValidacaoException(
-                    "O valor do plano " + dados.plano() + " deve ser R$ " + dados.plano().getValor());
-        }
     }
 }

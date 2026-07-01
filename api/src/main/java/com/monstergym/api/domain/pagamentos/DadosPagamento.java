@@ -8,6 +8,6 @@ import java.time.LocalDateTime;
 
 public record DadosPagamento(@NotNull Long idAluno,
                              @Valid Double valor,
-                             LocalDateTime dateHora,
+                             LocalDateTime dataHora,
                              Planos plano) {
 }
