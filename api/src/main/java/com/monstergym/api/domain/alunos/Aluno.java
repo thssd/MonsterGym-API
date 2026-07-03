@@ -1,5 +1,6 @@
 package com.monstergym.api.domain.alunos;
 
+import com.monstergym.api.domain.treinadores.Especialidade;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import lombok.*;
@@ -23,6 +24,12 @@ public class Aluno {
     @Enumerated(EnumType.STRING)
     private Planos plano;
 
+    private Double altura;
+    private Double peso;
+    private Especialidade objetivo;
+    private Sexo sexo;
+
+
     public Aluno(DadosAlunos dadosAlunos) {
         this.ativo = true;
         this.nome = dadosAlunos.nome();
@@ -30,6 +37,9 @@ public class Aluno {
         this.telefone = dadosAlunos.telefone();
         this.cpf = dadosAlunos.cpf();
         this.plano = dadosAlunos.plano();
+        this.altura = dadosAlunos.altura();
+        this.peso = dadosAlunos.peso();
+        this.objetivo = dadosAlunos.objetvo();
     }
 
     public void atualizarInformacoes(@Valid DadosAtualizarAluno dadosAtualizarAluno) {
@@ -44,6 +54,15 @@ public class Aluno {
         }
         if (dadosAtualizarAluno.plano() != null) {
             this.plano = dadosAtualizarAluno.plano();
+        }
+        if (dadosAtualizarAluno.altura() != null) {
+            this.altura = dadosAtualizarAluno.altura();
+        }
+        if (dadosAtualizarAluno.peso() != null) {
+            this.peso = dadosAtualizarAluno.peso();
+        }
+        if (dadosAtualizarAluno.objetivo() != null) {
+            this.objetivo = dadosAtualizarAluno.objetivo();
         }
     }
 
