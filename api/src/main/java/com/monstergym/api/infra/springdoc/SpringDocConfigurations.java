@@ -21,10 +21,11 @@ public class SpringDocConfigurations {
                                         .type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
                 .info(new Info()
                             .title("MonsterGym_API")
-                            .description("A RESTful API for gym management built with Java and Spring Boot. \" +\n" +
-                                    "                                    \"The system handles student and trainer registration with full CRUD operations, class scheduling with business rule validation, \" +\n" +
-                                    "                                    \"membership payments, physical assessments with automatic trainer matching, business statistics, \" +\n" +
-                                    "                                    \"and stateless JWT-based authentication with role-based access control.\"")
+                            .description("A RESTful API for gym management built with Java and Spring Boot. " +
+                                    "The system handles student and trainer registration with full CRUD operations, " +
+                                    "class scheduling with business rule validation, membership payments, " +
+                                    "physical assessments with automatic trainer matching, business statistics, " +
+                                    "and stateless JWT-based authentication with role-based access control")
                             .contact(new Contact()
                                     .name("Author")
                                     .email("thiagoshimizusodre@gmail.com")));
