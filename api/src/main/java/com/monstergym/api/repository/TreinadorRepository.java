@@ -1,5 +1,6 @@
 package com.monstergym.api.repository;
 
+import com.monstergym.api.domain.treinadores.DadosAvaliacaoTreinador;
 import com.monstergym.api.domain.treinadores.Especialidade;
 import com.monstergym.api.domain.treinadores.Treinador;
 import jakarta.validation.constraints.Future;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface TreinadorRepository extends JpaRepository<Treinador, Long>{
 
@@ -21,4 +23,6 @@ public interface TreinadorRepository extends JpaRepository<Treinador, Long>{
 
     @Query("select t.ativo from Treinador t where t.id = :idTreinador")
     Boolean findAtivoById(@NotNull Long idTreinador);
+
+    Optional<DadosAvaliacaoTreinador> findTopByEspecialidade(Especialidade especialidade);
 }
