@@ -42,7 +42,7 @@ public class Aluno {
         this.objetivo = dadosAlunos.objetvo();
     }
 
-    public void atualizarInformacoes(@Valid DadosAtualizarAluno dadosAtualizarAluno) {
+    public void atualizarInformacoes(@Valid DadosAtualizarAluno dadosAtualizarAluno){
         if (dadosAtualizarAluno.nome() != null) {
             this.nome = dadosAtualizarAluno.nome();
         }
@@ -55,14 +55,17 @@ public class Aluno {
         if (dadosAtualizarAluno.plano() != null) {
             this.plano = dadosAtualizarAluno.plano();
         }
-        if (dadosAtualizarAluno.altura() != null) {
-            this.altura = dadosAtualizarAluno.altura();
+    }
+
+    public void realizarAvaliacao(DadosAvaliacaoAlunos dados) {
+        if (dados.altura() != null) {
+            this.altura = dados.altura();
         }
-        if (dadosAtualizarAluno.peso() != null) {
-            this.peso = dadosAtualizarAluno.peso();
+        if (dados.peso() != null) {
+            this.peso = dados.peso();
         }
-        if (dadosAtualizarAluno.objetivo() != null) {
-            this.objetivo = dadosAtualizarAluno.objetivo();
+        if (dados.objetivo() != null) {
+            this.objetivo = dados.objetivo();
         }
     }
 
