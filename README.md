@@ -1,6 +1,6 @@
 # 🏋️ MonsterGym API
 
-A RESTful API for gym management built with Java and Spring Boot. The system handles student and trainer registration with full CRUD operations, class scheduling with business rule validation, stateless JWT-based authentication, and role-based access control.
+A RESTful API for gym management built with Java and Spring Boot. The system handles student and trainer registration with full CRUD operations, class scheduling with business rule validation, membership payments, physical assessments with automatic specialty matching, business statistics, stateless JWT-based authentication, and role-based access control.
 
 ---
 
@@ -12,6 +12,9 @@ A RESTful API for gym management built with Java and Spring Boot. The system han
 - Class scheduling with automatic trainer assignment by specialty
 - Business rule validation pipeline using the Strategy pattern
 - Class cancellation with reason tracking and 24-hour advance notice rule
+- Membership payments with plan pricing validation and a 30-day interval rule between payments
+- Physical assessment (BMI calculation) with automatic trainer specialty recommendation based on the result
+- Business statistics endpoint (count, sum, average, max and min of all payments)
 - Soft delete — records are deactivated, not removed from the database
 - Pagination and sorting on listing endpoints
 - Automated database migrations with Flyway
@@ -176,9 +179,16 @@ Content-Type: application/json
   "nome": "Carlos Silva",
   "email": "carlos@email.com",
   "telefone": "11999998888",
-  "cpf": "123.456.789-00"
+  "cpf": "123.456.789-00",
+  "plano": "PREMIUM",
+  "altura": 1.78,
+  "peso": 82.5,
+  "objetvo": "HIPERTROFIA"
 }
 ```
+
+Available plans: `PADRAO`, `PREMIUM`, `MONSTER` (see [Membership plans](#membership-plans) for pricing).
+`altura`, `peso` and `objetvo` (training goal) feed the physical assessment feature below and can be provided at registration or updated later.
 
 #### List students (paginated)
 
@@ -199,7 +209,8 @@ Content-Type: application/json
 {
   "id": 1,
   "nome": "Carlos Souza",
-  "telefone": "11988887777"
+  "telefone": "11988887777",
+  "plano": "MONSTER"
 }
 ```
 
@@ -302,6 +313,137 @@ Returns `204 No Content`.
 
 ---
 
+### Payments — `/pagamentos`
+
+All endpoints require authentication.
+
+| Method | Endpoint       | Role required | Description                |
+|--------|----------------|---------------|-----------------------------|
+| POST   | `/pagamentos`  | USER          | Register a membership payment |
+| GET    | `/pagamentos`  | USER          | List payments (paginated)  |
+| DELETE | `/pagamentos`  | USER          | Cancel a payment           |
+
+#### Register a payment
+
+```http
+POST /pagamentos
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "idAluno": 1,
+  "valor": 120.00,
+  "plano": "PREMIUM"
+}
+```
+
+The payment date/time is set automatically by the server.
+
+#### List payments (paginated)
+
+```http
+GET /pagamentos?page=0&size=10
+Authorization: Bearer <token>
+```
+
+#### Cancel a payment
+
+```http
+DELETE /pagamentos
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "idPagamento": 10
+}
+```
+
+Returns `204 No Content`.
+
+##### Membership plans
+
+| Plan      | Price (R$) |
+|-----------|-----------|
+| PADRAO    | 100.00    |
+| PREMIUM   | 120.00    |
+| MONSTER   | 180.00    |
+
+---
+
+### Physical Assessment — `/avaliacao`
+
+Requires authentication.
+
+| Method | Endpoint          | Role required | Description                          |
+|--------|-------------------|---------------|---------------------------------------|
+| PUT    | `/avaliacao/alunos` | USER        | Run a physical assessment for a student |
+
+#### Assess a student
+
+```http
+PUT /avaliacao/alunos
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "id": 1,
+  "altura": 1.78,
+  "peso": 82.5,
+  "objetivo": "HIPERTROFIA"
+}
+```
+
+The student's height, weight and training goal are updated with the values sent, then the API calculates their BMI and recommends a trainer.
+
+Response:
+```json
+{
+  "resultado": "Peso normal.",
+  "treinador": {
+    "id": 2,
+    "nome": "Ana Lima",
+    "telefone": "11977776666",
+    "especialidade": "HIPERTROFIA"
+  }
+}
+```
+
+The recommended specialty is chosen automatically based on the BMI result:
+
+| BMI result           | Recommended specialty |
+|-----------------------|-----------------------|
+| Abaixo do peso (underweight) | `HIPERTROFIA` |
+| Peso normal (normal weight)   | The student's own stated `objetivo` |
+| Sobrepeso (overweight)        | `FUNCIONAL` |
+| Obesidade (obesity)           | `EMAGRECIMENTO` |
+| Obesidade mórbida (morbid obesity) | `EMAGRECIMENTO` |
+
+---
+
+### Statistics — `/estatisticas`
+
+| Method | Endpoint        | Role required | Description                        |
+|--------|-----------------|---------------|-------------------------------------|
+| GET    | `/estatisticas` | USER          | Aggregate statistics over all payments |
+
+```http
+GET /estatisticas
+Authorization: Bearer <token>
+```
+
+Response:
+```json
+{
+  "count": 42,
+  "sum": 5040.00,
+  "avg": 120.00,
+  "max": 180.00,
+  "min": 100.00
+}
+```
+
+---
+
 ## Business Rules
 
 ### Scheduling validations
@@ -325,6 +467,14 @@ All rules below are enforced before a class is saved. Any violation returns `400
 | Reason required | A cancellation reason (`motivoCancelamento`) is always required |
 | Description required for "other" | When the reason is `OUTRO`, a `descricao` must be provided |
 
+### Payment validations
+
+| Rule | Description |
+|------|-------------|
+| Existing student | The `idAluno` informed must exist |
+| Price matches plan | The `valor` sent must match the price registered for the chosen `plano` |
+| 30-day interval | A student can only make a new payment 30 days after their last one |
+
 ---
 
 ## Project Structure
@@ -336,6 +486,9 @@ src/main/java/com/monstergym/api/
 │   ├── AlunosController.java
 │   ├── TreinadorController.java
 │   ├── AulaController.java
+│   ├── PagamentoController.java
+│   ├── AvaliacaoController.java
+│   ├── EstatisticaController.java
 │   └── AutenticacaoController.java
 │
 ├── domain/                  # Entities and DTOs
@@ -344,12 +497,19 @@ src/main/java/com/monstergym/api/
 │   ├── aulas/
 │   │   ├── validacoes/      # Scheduling business rule validators
 │   │   └── cancelamentos/   # Cancellation business rule validators
+│   ├── pagamentos/
+│   │   └── validacoes/      # Payment business rule validators
+│   ├── avaliacoes/          # BMI calculation and specialty recommendation
+│   ├── estatisticas/
 │   └── user/
 │
 ├── repository/              # Spring Data JPA repositories
 │
 ├── service/                 # Business logic
 │   ├── AulaService.java
+│   ├── PagametoService.java
+│   ├── AvaliacaoService.java
+│   ├── EstatisticaService.java
 │   ├── AuthorizationService.java
 │   └── TokenService.java
 │
@@ -411,14 +571,19 @@ Migrations are managed by Flyway and run automatically on startup.
 | role     | TEXT   | `ADMIN` or `USER` |
 
 **aluno**
-| Column   | Type    | Notes            |
-|----------|---------|------------------|
-| id       | BIGINT  | Primary key      |
-| nome     | TEXT    |                  |
-| email    | TEXT    |                  |
-| telefone | TEXT    |                  |
-| cpf      | TEXT    |                  |
-| ativo    | BOOLEAN | Soft delete flag |
+| Column    | Type    | Notes                                                        |
+|-----------|---------|---------------------------------------------------------------|
+| id        | BIGINT  | Primary key                                                    |
+| nome      | TEXT    |                                                                |
+| email     | TEXT    |                                                                |
+| telefone  | TEXT    |                                                                |
+| cpf       | TEXT    |                                                                |
+| ativo     | BOOLEAN | Soft delete flag                                               |
+| plano     | TEXT    | `PADRAO`, `PREMIUM`, `MONSTER`                                 |
+| altura    | DOUBLE  | Used for BMI calculation                                        |
+| peso      | DOUBLE  | Used for BMI calculation                                        |
+| objetivo  | TEXT    | Training goal / specialty (`HIPERTROFIA`, `EMAGRECIMENTO`, `FUNCIONAL`, `REABILITACAO`) |
+| sexo      | TEXT    | `HOMEM` or `MULHER`                                             |
 
 **treinadores**
 | Column        | Type    | Notes                                               |
@@ -432,7 +597,7 @@ Migrations are managed by Flyway and run automatically on startup.
 
 **consultas** (aulas)
 | Column              | Type      | Notes                                                                  |
-|---------------------|-----------|------------------------------------------------------------------------|
+|---------------------|-----------|--------------------------------------------------------------------------|
 | id                  | BIGINT    | Primary key                                                            |
 | aluno_id            | BIGINT    | FK → aluno                                                             |
 | treinador_id        | BIGINT    | FK → treinadores                                                       |
@@ -440,6 +605,14 @@ Migrations are managed by Flyway and run automatically on startup.
 | especialidade       | TEXT      | Specialty at the time of booking                                       |
 | motivoCancelamento  | TEXT      | `PACIENTE_DESISTIU`, `MEDICO_CANCELOU`, `IMPREVISTO`, `FALTA_DE_TEMPO`, `OUTRO` |
 | descricao           | TEXT      | Required when `motivoCancelamento = OUTRO`                             |
+
+**pagamentos**
+| Column    | Type      | Notes                                    |
+|-----------|-----------|-------------------------------------------|
+| id        | BIGINT    | Primary key                               |
+| valor     | DOUBLE PRECISION | Payment amount, must match the plan price |
+| data_hora | TIMESTAMP | Set automatically at payment time         |
+| aluno_id  | BIGINT    | FK → aluno (unique — one active payment record per student) |
 
 ---
 
