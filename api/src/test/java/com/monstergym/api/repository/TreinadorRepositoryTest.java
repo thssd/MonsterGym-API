@@ -2,10 +2,12 @@ package com.monstergym.api.repository;
 
 import com.monstergym.api.domain.alunos.Aluno;
 import com.monstergym.api.domain.alunos.DadosAlunos;
+import com.monstergym.api.domain.alunos.Planos;
 import com.monstergym.api.domain.aulas.Aula;
 import com.monstergym.api.domain.treinadores.DadosTreinadores;
 import com.monstergym.api.domain.treinadores.Especialidade;
 import com.monstergym.api.domain.treinadores.Treinador;
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import java.time.temporal.TemporalAdjusters;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RequiredArgsConstructor
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
@@ -50,7 +53,11 @@ class TreinadorRepositoryTest {
                 "Aluno",
                 "aluno@email",
                 "11888888888",
-                "12345678901");
+                "12345678901",
+                Planos.PADRAO,
+                1.80,
+                80.0,
+                Especialidade.FUNCIONAL);
 
         cadastrarAula(treinador, aluno, segundaAs10);
 
@@ -95,8 +102,25 @@ class TreinadorRepositoryTest {
         return treinador;
     }
 
-    private Aluno cadastrarAluno(String nome, String email, String telefone, String cpf) {
-        var aluno = new Aluno(new DadosAlunos(nome, email, telefone, cpf));
+    private Aluno cadastrarAluno(
+            String nome,
+            String email,
+            String telefone,
+            String cpf,
+            Planos planos,
+            Double altura,
+            Double peso,
+            Especialidade objetivo) {
+
+        var aluno = new Aluno(new DadosAlunos(nome,
+                email,
+                telefone,
+                cpf,
+                planos,
+                altura,
+                peso,
+                objetivo));
+
         testEntityManager.persist(aluno);
         return aluno;
     }
@@ -110,13 +134,23 @@ class TreinadorRepositoryTest {
         );
     }
 
-    private DadosAlunos dadosAlunos(String nome, String email, String telefone, String cpf) {
+    private DadosAlunos dadosAlunos(String nome,
+                                    String email,
+                                    String telefone,
+                                    String cpf,
+                                    Planos planos,
+                                    Double altura,
+                                    Double peso,
+                                    Especialidade objetivo) {
         return new DadosAlunos(
                 nome,
                 email,
                 telefone,
-                cpf
-        );
+                cpf,
+                planos,
+                altura,
+                peso,
+                objetivo);
     }
 
 }
