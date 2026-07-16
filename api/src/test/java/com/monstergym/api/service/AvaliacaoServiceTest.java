@@ -6,6 +6,7 @@ import com.monstergym.api.domain.avaliacoes.DadosAvaliacao;
 import com.monstergym.api.domain.avaliacoes.EscolherEspecialidade;
 import com.monstergym.api.domain.treinadores.DadosAvaliacaoTreinador;
 import com.monstergym.api.domain.treinadores.Especialidade;
+import com.monstergym.api.infra.exceptions.ValidacaoException;
 import com.monstergym.api.repository.TreinadorRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AvaliacaoServiceTest {
@@ -37,7 +39,7 @@ class AvaliacaoServiceTest {
     @Test
     @DisplayName("deve retornar DadosAvaliacao com sucesso " +
             "quando encontrar um treinador para a especialidade escolhida")
-    void retornaResultado() {
+    void retornaResultado_caso1() {
         //arange
         Especialidade especialidadeEsperada = Especialidade.FUNCIONAL;
 
@@ -76,5 +78,46 @@ class AvaliacaoServiceTest {
         assertThat(resultado.resultado()).isEqualTo(resultadoIMC);
         assertThat(resultado.treinador()).isEqualTo(dadosAvaliacaoTreinador);
 
+        verify(calculoIMC).calculoIMC(dadosAvaliacaoAlunos);
+        verify(escolherEspecialidade)
+                .escoherEspecialidade(resultadoIMC, dadosAvaliacaoAlunos.objetivo());
+        verify(treinadorRepository).findTopByEspecialidade(especialidadeEsperada);
+        verifyNoMoreInteractions(
+                calculoIMC,
+                escolherEspecialidade,
+                treinadorRepository);
+    }
+
+    @Test
+    @DisplayName("deve lançar exception " +
+            "quando nenhum treinador for encontrado para a especilidade")
+    void retornaResultado_caso2() {
+        //arrange
+        Especialidade especialidadeEsperada = Especialidade.FUNCIONAL;
+
+        DadosAvaliacaoAlunos dadosAvaliacaoAlunos = new DadosAvaliacaoAlunos(
+                1L,
+                1.75,
+                80.0,
+                especialidadeEsperada
+        );
+        String resultadoIMC = "Sobrepeso.";
+
+        when(calculoIMC.calculoIMC(dadosAvaliacaoAlunos)).thenReturn(resultadoIMC);
+
+        when(escolherEspecialidade.escoherEspecialidade(
+                resultadoIMC,
+                dadosAvaliacaoAlunos.objetivo())).thenReturn(especialidadeEsperada);
+
+        when(treinadorRepository.findTopByEspecialidade(especialidadeEsperada))
+                .thenReturn(Optional.empty());
+
+        //assert & assert
+        assertThatThrownBy(() ->
+                avaliacaoService.retornaResultado(dadosAvaliacaoAlunos))
+                .isInstanceOf(ValidacaoException.class)
+                .hasMessageContaining("Nenhum treinador foi encontrado");
+
+        verify(treinadorRepository).findTopByEspecialidade(especialidadeEsperada);
     }
 }
