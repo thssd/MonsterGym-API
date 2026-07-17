@@ -3,6 +3,7 @@ package com.monstergym.api.service;
 import com.monstergym.api.domain.alunos.Aluno;
 import com.monstergym.api.domain.alunos.DadosAlunos;
 import com.monstergym.api.domain.alunos.Planos;
+import com.monstergym.api.domain.pagamentos.DadosCancelamentoPagamento;
 import com.monstergym.api.domain.pagamentos.DadosPagamento;
 import com.monstergym.api.domain.pagamentos.Pagamento;
 import com.monstergym.api.domain.pagamentos.validacoes.IValidadorPagamento;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -115,12 +117,13 @@ class PagametoServiceTest {
         }
 
         @Test
-        @DisplayName("deve lançar exception quando validador1 rejeita")
+        @DisplayName("deve lançar exception quando valor do plano estiver errado " +
+                "(validador1 rejeita)")
         void aprovarPagamento_caso3() {
             //arrange
             var dados = new DadosPagamento(
                     1L,
-                    100.0,
+                    90.0,
                     LocalDateTime.now(),
                     Planos.PADRAO
             );
@@ -149,10 +152,87 @@ class PagametoServiceTest {
                     pagamentoService.aprovarPagamento(dados));
 
             verify(pagamentoRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("deve lançar exception " +
+                "quando ultimo pagamento foi realizado em menos de trinta dias" +
+                "(validador2 rejeita)")
+        void aprovarPagamento_caso4() {
+            //arrange
+            var dados = new DadosPagamento(
+                    1L,
+                    100.0,
+                    LocalDateTime.now(),
+                    Planos.PADRAO
+            );
+
+            Aluno aluno = new Aluno(new DadosAlunos(
+                    "Aluno",
+                    "aluno@email",
+                    "11888888888",
+                    "12345678901",
+                    Planos.PADRAO,
+                    1.80,
+                    80.0,
+                    Especialidade.FUNCIONAL)
+            );
+            when(alunoRepository.existsById(dados.idAluno())).thenReturn(true);
+
+            when(alunoRepository.getReferenceById(dados.idAluno())).thenReturn(aluno);
+
+            //act
+            doThrow(new ValidacaoException("Você só pode realizar um pagamento a cada 30 dias."))
+                    .when(validador2).validar(dados);
+
+            //assert
+            assertThrows(ValidacaoException.class, () ->
+                    pagamentoService.aprovarPagamento(dados));
+
+            verify(pagamentoRepository, never()).save(any());
 
         }
     }
 
     @Nested
-    class cancelarPagamento {}
+    class cancelarPagamento {
+
+        @Test
+        @DisplayName("nao deve cancelar o pagamento quando id é inválido")
+        void cancelarPagamento_caso1() {
+            //arrange
+            DadosCancelamentoPagamento dadosCancelamento =
+                    new DadosCancelamentoPagamento(99L);
+
+            when(pagamentoRepository.existsById(dadosCancelamento.idPagamento()))
+                    .thenReturn(false);
+
+            //act & assert
+            assertThrows(ValidacaoException.class, () ->
+                    pagamentoService.cancelarPagamento(dadosCancelamento));
+
+            verify(pagamentoRepository, never())
+                    .deleteById(dadosCancelamento.idPagamento());
+        }
+
+        @Test
+        @DisplayName("deve cancelar pagamento quando id é valido")
+        void cancelarPagamento_caso2() {
+            //arrange
+            DadosCancelamentoPagamento dadosCancelamento =
+                    new DadosCancelamentoPagamento(1L);
+
+            when(pagamentoRepository.existsById(dadosCancelamento.idPagamento()))
+                    .thenReturn(true);
+
+            //act
+            pagamentoService.cancelarPagamento(dadosCancelamento);
+
+            //assert
+            assertNotNull(dadosCancelamento);
+
+            verify(pagamentoRepository, times(1))
+                    .deleteById(dadosCancelamento.idPagamento());
+        }
+    }
 }
