@@ -32,7 +32,8 @@ public class AvaliacaoService {
 
         DadosAvaliacaoTreinador treinador = treinadorRepository
                 .findTopByEspecialidade(especialidade)
-                .orElseThrow(() -> new ValidacaoException("Nenhum treinador foi encontrado"));
+                .orElseThrow(() ->
+                        new ValidacaoException("Nenhum treinador foi encontrado"));
 
         return new DadosAvaliacao(resultado, treinador);
     }

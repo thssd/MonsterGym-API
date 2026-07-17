@@ -40,7 +40,7 @@ class AvaliacaoServiceTest {
     @DisplayName("deve retornar DadosAvaliacao com sucesso " +
             "quando encontrar um treinador para a especialidade escolhida")
     void retornaResultado_caso1() {
-        //arange
+        //arrange
         Especialidade especialidadeEsperada = Especialidade.FUNCIONAL;
 
         DadosAvaliacaoTreinador dadosAvaliacaoTreinador = new DadosAvaliacaoTreinador(

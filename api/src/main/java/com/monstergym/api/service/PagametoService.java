@@ -34,7 +34,13 @@ public class PagametoService {
         var dataHora = LocalDateTime.now();
 
         var aluno = alunoRepository.getReferenceById(dados.idAluno());
-        var pagamento = new Pagamento(null, dados.valor(), dataHora, dados.plano(), aluno);
+        var pagamento = new Pagamento(
+                null,
+                dados.valor(),
+                dataHora,
+                dados.plano(),
+                aluno
+        );
 
         validadores.forEach(v -> v.validar(dados));
 
