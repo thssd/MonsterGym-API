@@ -4,7 +4,7 @@ import com.monstergym.api.domain.pagamentos.DadosCancelamentoPagamento;
 import com.monstergym.api.domain.pagamentos.DadosDetalhamentoPagamento;
 import com.monstergym.api.domain.pagamentos.DadosPagamento;
 import com.monstergym.api.repository.PagamentoRepository;
-import com.monstergym.api.service.PagametoService;
+import com.monstergym.api.service.PagamentoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class PagamentoController {
 
     @Autowired
-    private PagametoService service;
+    private PagamentoService service;
 
     @Autowired
     private PagamentoRepository repository;

@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class PagametoService {
+public class PagamentoService {
 
     @Autowired
     private AlunoRepository alunoRepository;
