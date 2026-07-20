@@ -3,7 +3,9 @@ package com.monstergym.api.service;
 import com.monstergym.api.domain.alunos.Aluno;
 import com.monstergym.api.domain.aulas.Aula;
 import com.monstergym.api.domain.aulas.DadosAula;
+import com.monstergym.api.domain.aulas.cancelamentos.DadosCancelamentoAula;
 import com.monstergym.api.domain.aulas.cancelamentos.IValidadorCancelamentoAula;
+import com.monstergym.api.domain.aulas.cancelamentos.MotivoCancelamento;
 import com.monstergym.api.domain.aulas.validacoes.IValidadorAula;
 import com.monstergym.api.domain.treinadores.Especialidade;
 import com.monstergym.api.domain.treinadores.Treinador;
@@ -24,7 +26,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -266,13 +267,87 @@ class AulaServiceTest {
     class cancelar {
 
         @Test
-        @DisplayName("deve lançar exception quando id do aluno não existe")
+        @DisplayName("deve lançar exception quando id da aula nulo")
         void cancelar_caso1() {
             //arrange
+            var dados = new DadosCancelamentoAula(
+                    null,
+                    MotivoCancelamento.PACIENTE_DESISTIU,
+                    null
+            );
+            when(aulaRepository.existsById(dados.idConsulta()))
+                    .thenReturn(false);
+
+            //act & assert
+            assertThatThrownBy(() ->
+                    aulaService.cancelar(dados))
+                    .isInstanceOf(ValidacaoException.class)
+                    .hasMessage("Id da consulta não informado ou não existe");
+        }
+
+        @Test
+        @DisplayName("deve lançar exception quando o MotivoCancelamento for nulo")
+        void cancelar_caso2() {
+            //arrange
+            var dados = new DadosCancelamentoAula(
+                    1L,
+                    null,
+                    null
+            );
+            when(aulaRepository.existsById(dados.idConsulta()))
+                    .thenReturn(true);
+
+            //act & assert
+            assertThatThrownBy(() ->
+                    aulaService.cancelar(dados))
+                    .isInstanceOf(ValidacaoException.class)
+                    .hasMessage("Por favor, informe o motivo do cancelamento.");
+        }
+
+        @Test
+        @DisplayName("deve lançar exception quanto MotivoCancelamento.OUTRO" +
+                " e descrição == null")
+        void cancelar_caso3() {
+            //arrange
+            var dados = new DadosCancelamentoAula(
+                    1L,
+                    MotivoCancelamento.OUTRO,
+                    null
+            );
+            when(aulaRepository.existsById(dados.idConsulta()))
+                    .thenReturn(true);
+
+            //act & assert
+            assertThatThrownBy(() ->
+                    aulaService.cancelar(dados))
+                    .isInstanceOf(ValidacaoException.class)
+                    .hasMessage("Informe o motivo do cancelamento.");
+        }
+
+        @Test
+        @DisplayName("deve acionar os canceladores e cancelar a aula")
+        void cancelar_caso4() {
+            //arrange
+            var dados = new DadosCancelamentoAula(
+                    1L,
+                    MotivoCancelamento.PACIENTE_DESISTIU,
+                    null
+            );
+
+            var aula = mock(Aula.class);
+
+            when(aulaRepository.existsById(dados.idConsulta()))
+                    .thenReturn(true);
+
+            when(aulaRepository.getReferenceById(dados.idConsulta()))
+                    .thenReturn(aula);
 
             //act
+            aulaService.cancelar(dados);
 
             //assert
+            verify(validadorCancelamento).cancelar(dados);
+            verify(aula).cancelar(MotivoCancelamento.PACIENTE_DESISTIU, null);
         }
     }
 }
